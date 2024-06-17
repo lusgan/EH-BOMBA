@@ -1,25 +1,11 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Jun 16 20:42:19 2024
-
-@author: balbi
-"""
-
-'''
-Os vértices representam produtos químicos
-necessários em algum processo de produção.
-
-Existe uma aresta ligando cada par de produtos
-que podem explodir, se combinados.
-
-O número cromático representa o número
-mínimo de compartimentos para guardar estes
-produtos químicos em segurança.
-'''
-
 import networkx as nx
 import matplotlib.pyplot as plt
+import random
 
+def generate_large_scale_graph(num_nodes, probability):
+    # Gera um grafo aleatório com uma probabilidade definida de arestas entre os nós
+    G = nx.erdos_renyi_graph(num_nodes, probability)
+    return G
 
 incompatibilidade_quimica = {
     "Ácido acético": ["Ácido nítrico", "Peróxidos", "Hipoclorito de sódio"],
@@ -105,7 +91,30 @@ def coloracao(G):
                 break
         colors[node] = color
     return colors
-# Instanciando a classe Estante
+def gerar_produtos_quimicos(estante, num_produtos, probabilidade):
+    # Adiciona os produtos químicos à estante
+    for i in range(num_produtos):
+        produto = str(i)
+        pode_colocar_no_alto = random.random() < probabilidade
+        estante.adicionarMaterial(produto, pode_colocar_no_alto)
+    
+    # Cria conexões entre produtos químicos que não podem estar juntos
+    for i in range(num_produtos):
+        for j in range(i+1, num_produtos):
+            if random.random() < probabilidade:
+                estante.conectar(str(i), str(j))
+def coloracao_gulosa(G):
+    colors = {}  # Dicionário para armazenar as cores dos nós
+    for node in G.nodes():  # Itera sobre cada nó no grafo
+        available_colors = set(range(len(G)))  # Cria um conjunto de cores possíveis
+        for neighbor in G[node]:  # Verifica as cores dos vizinhos
+            if neighbor in colors:  # Se o vizinho já tiver uma cor
+                available_colors.discard(colors[neighbor])  # Remove essa cor das disponíveis
+        colors[node] = min(available_colors)  # Atribui a menor cor disponível ao nó
+    return colors
+
+
+# Imprimindo o número cromático do grafo
 estante = Estante()
 
 # Adicionando materiais à estante e definindo se podem ser colocados no alto
@@ -125,6 +134,23 @@ nx.draw(estante.G, node_color=[colors[node] for node in estante.G.nodes()], with
 plt.show()
 
 # Imprimindo o número cromático do grafo
-print(f"O número mínimo de compartimentos para guardar estes produtos químicos em segurança é: {max(colors.values()) + 1}")
+print(f"Materias de verdade: O número mínimo de compartimentos para guardar estes produtos químicos em segurança é: {max(colors.values()) + 1}")
+estante = Estante()
+num_produtos = 100  # Número de produtos químicos
+probabilidade = 0.5  # Probabilidade de poderem ou não estar um ao lado do outro
+gerar_produtos_quimicos(estante, num_produtos, probabilidade)
+estante.mostrarGrafo()
+colors = coloracao(estante.G)
+nx.draw(estante.G, node_color=[colors[node] for node in estante.G.nodes()], with_labels=True)
+plt.show()
+
+# Imprimindo o número cromático do grafo
+print(f"Ideal: O número mínimo de compartimentos para guardar estes produtos químicos em segurança é: {max(colors.values()) + 1}")
 
 
+colors = coloracao_gulosa(estante.G)
+nx.draw(estante.G, node_color=[colors[node] for node in estante.G.nodes()], with_labels=True)
+plt.show()
+
+# Imprimindo o número cromático do grafo
+print(f"Gulosa: O número mínimo de compartimentos para guardar estes produtos químicos em segurança é: {max(colors.values()) + 1}")
