@@ -2,11 +2,6 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import random
 
-def generate_large_scale_graph(num_nodes, probability):
-    # Gera um grafo aleatório com uma probabilidade definida de arestas entre os nós
-    G = nx.erdos_renyi_graph(num_nodes, probability)
-    return G
-
 incompatibilidade_quimica = {
     "Ácido acético": ["Ácido nítrico", "Peróxidos", "Hipoclorito de sódio"],
     "Ácido nítrico": ["Ácido acético", "Ácido clorídrico", "Metanol"],
