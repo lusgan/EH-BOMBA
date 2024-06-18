@@ -15,6 +15,7 @@ incompatibilidade_quimica = {
     "Acetileno": ["Cloro", "Fluor", "Cobre", "Prata"],
     "Bromo": ["Amônia", "Acetona", "Hidrogênio"],
 }
+
 quimicos_armazenados_alto = [
     "Acetona",
     "Ácido acético",
@@ -39,6 +40,7 @@ quimicos_armazenados_alto = [
     "Peróxido de hidrogênio", 
     "Hidrazina"
 ]
+
 quimicos_nao_armazenados_alto = [
     "Acetileno",  # Armazenar em local fresco e ventilado, longe de oxidantes
     "Bromo",      # Armazenar em local fresco, fora da luz direta do sol
@@ -54,6 +56,9 @@ quimicos_nao_armazenados_alto = [
     "Sistemas de purificação de água",
     "Estufas de secagem"
 ]
+
+
+
 class Estante:
     
     def __init__(self):
@@ -77,6 +82,10 @@ class Estante:
     def mostrarGrafo(self):
         nx.draw(self.G, with_labels=True)
         plt.show()
+
+
+
+
 def coloracao(G):
     colors = {}
     for node in sorted(G.nodes(), key=lambda x: len(G[x]), reverse=True):
@@ -86,6 +95,8 @@ def coloracao(G):
                 break
         colors[node] = color
     return colors
+
+
 def gerar_produtos_quimicos(estante, num_produtos, probabilidade):
     # Adiciona os produtos químicos à estante
     for i in range(num_produtos):
@@ -98,6 +109,9 @@ def gerar_produtos_quimicos(estante, num_produtos, probabilidade):
         for j in range(i+1, num_produtos):
             if random.random() < probabilidade:
                 estante.conectar(str(i), str(j))
+
+
+
 def coloracao_gulosa(G):
     colors = {}  # Dicionário para armazenar as cores dos nós
     for node in G.nodes():  # Itera sobre cada nó no grafo
@@ -109,7 +123,7 @@ def coloracao_gulosa(G):
     return colors
 
 
-# Imprimindo o número cromático do grafo
+
 estante = Estante()
 
 # Adicionando materiais à estante e definindo se podem ser colocados no alto
@@ -119,17 +133,22 @@ for material in quimicos_armazenados_alto:
 for material in quimicos_nao_armazenados_alto:
     estante.adicionarMaterial(material, False)
 
+
 # Conectando materiais incompatíveis
 for material, incompativeis in incompatibilidade_quimica.items():
     for incompativel in incompativeis:
         estante.conectar(material, incompativel)
+
+
 # Colorindo o grafo
 colors = coloracao(estante.G)
 nx.draw(estante.G, node_color=[colors[node] for node in estante.G.nodes()], with_labels=True)
 plt.show()
-
 # Imprimindo o número cromático do grafo
 print(f"Materias de verdade: O número mínimo de compartimentos para guardar estes produtos químicos em segurança é: {max(colors.values()) + 1}")
+
+
+
 estante = Estante()
 num_produtos = 100  # Número de produtos químicos
 probabilidade = 0.5  # Probabilidade de poderem ou não estar um ao lado do outro
@@ -138,7 +157,6 @@ estante.mostrarGrafo()
 colors = coloracao(estante.G)
 nx.draw(estante.G, node_color=[colors[node] for node in estante.G.nodes()], with_labels=True)
 plt.show()
-
 # Imprimindo o número cromático do grafo
 print(f"Ideal: O número mínimo de compartimentos para guardar estes produtos químicos em segurança é: {max(colors.values()) + 1}")
 
@@ -146,6 +164,5 @@ print(f"Ideal: O número mínimo de compartimentos para guardar estes produtos q
 colors = coloracao_gulosa(estante.G)
 nx.draw(estante.G, node_color=[colors[node] for node in estante.G.nodes()], with_labels=True)
 plt.show()
-
 # Imprimindo o número cromático do grafo
 print(f"Gulosa: O número mínimo de compartimentos para guardar estes produtos químicos em segurança é: {max(colors.values()) + 1}")
